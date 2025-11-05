@@ -1,0 +1,33 @@
+{% extends 'cards/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 600px;">
+    <h2 class="mb-4 text-center">
+        {% if form.initial.parent %}
+            Добавить подкатегорию к "{{ form.initial.parent }}"
+        {% else %}
+            Добавить категорию
+        {% endif %}
+    </h2>
+
+    <form method="post" class="p-4 bg-white shadow rounded">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_name" class="form-label">Название</label>
+            {% render_field form.name class="form-control" placeholder="Например: Python" %}
+        </div>
+
+        <div class="mb-3">
+            <label for="id_parent" class="form-label">Родительская категория</label>
+            {% render_field form.parent class="form-select" %}
+            <div class="form-text text-muted">Оставьте пустым, если это основная категория</div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success px-4">Сохранить</button>
+            <a href="{% url 'home' %}" class="btn btn-secondary px-4 ms-2">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'cards/base.html' %}
+{% block content %}
+
+<h2 class="mb-4 text-center">🧠 Мои карточки</h2>
+
+<!-- 🔍 Поиск -->
+
+<form method="get" class="row g-3 mb-4 align-items-center justify-content-center">
+  <div class="col-md-6">
+    <input type="text" name="q" class="form-control" placeholder="Поиск по вопросу..." value="{{ request.GET.q }}">
+  </div>
+  <div class="col-md-2">
+    <button type="submit" class="btn btn-primary w-100">Найти</button>
+  </div>
+</form>
+
+<!-- 🗂 Категории и подкатегории -->
+<div class="mb-4">
+  <h5 class="fw-bold">Категории</h5>
+  {% for category in categories %}
+    <div class="mb-3">
+      <!-- Основная категория -->
+      <a href="?category={{ category.name }}"
+         class="btn btn-outline-primary btn-sm {% if selected_category == category.name %}active{% endif %}">
+        {{ category.name }}
+      </a>
+
+      <!-- 🔹 Кнопка "Добавить подкатегорию" -->
+      <a href="{% url 'add_subcategory' category.id %}"
+         class="btn btn-outline-success btn-sm ms-2">
+        ➕ Подкатегория
+      </a>
+
+      <!-- Подкатегории -->
+      {% if category.subcategories.all %}
+        <div class="ms-4 mt-2">
+          {% for sub in category.subcategories.all %}
+            <a href="?subcategory={{ sub.name }}"
+               class="btn btn-outline-secondary btn-sm {% if selected_subcategory == sub.name %}active{% endif %}">
+              ↳ {{ sub.name }}
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p class="text-muted">Категорий пока нет 😕</p>
+  {% endfor %}
+</div>
+<hr>
+
+<!-- 💡 Карточки -->
+
+{% if cards %}
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for card in cards %}
+    <div class="col">
+      <div class="flip-card" onclick="this.classList.toggle('flipped')">
+        <div class="flip-card-inner shadow-sm border-0">
+
+      <!-- Передняя сторона -->
+      <div class="flip-card-front card bg-white p-3 d-flex flex-column justify-content-between">
+        <div>
+          <h5 class="card-title">{{ card.question }}</h5>
+          <p class="text-muted small">{{ card.category.name }}</p>
+        </div>
+        <div class="text-center mt-3">
+          <p class="text-primary fw-semibold">Узнать ответ</p>
+        </div>
+      </div>
+
+      <!-- Обратная сторона -->
+      <div class="flip-card-back card bg-primary text-white p-3 d-flex flex-column justify-content-between">
+        <div>
+          <h5 class="card-title">{{ card.answer }}</h5>
+        </div>
+        <div class="text-center mt-3">
+          <p class="text-light">Вернуться</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопки -->
+  <div class="text-center mt-2">
+    <a href="{% url 'edit_card' card.id %}" class="btn btn-sm bg-success text-white">✏️</a>
+    <a href="{% url 'delete_card' card.id %}" class="btn btn-sm bg-danger text-white">❌</a>
+  </div>
+</div>
+{% endfor %}
+
+  </div>
+{% else %}
+  <div class="text-center text-muted py-5">
+    <p>Нет карточек 😕</p>
+    <a href="{% url 'add_card' %}" class="btn btn-primary">Создать первую карточку</a>
+  </div>
+{% endif %}
+{% endblock %}
